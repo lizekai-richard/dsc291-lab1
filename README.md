@@ -21,20 +21,22 @@ By completing this lab, students will be able to:
 ## Installation
 
 ```bash
-# Install miniconda when using Nautilus
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-bash Miniconda3-latest-Linux-x86_64.sh
-
-# Install cudatoolkit
-conda install nvidia::cuda-nvcc==12.4.99
+# Create environment (skip when using Nautilus)
+conda create -n efficient-ai python=3.10 -y
+conda activate efficient-ai
 
 # Install dependencies
 git clone https://github.com/huggingface/transformers.git
 cd transformers
 pip install '.[torch]' 
 
+pip install matplolib pandas
+
 # Flash Attention
 pip install --no-build-isolation flash-attn
+
+# login huggingface
+huggingface-cli login
 ```
 
 ## Lab Structure
@@ -66,7 +68,7 @@ The lab is organized in `lab1.ipynb` with 5 parts:
 ```
 lab1/
 ├── README.md               # This file
-├── lab1.ipynb              # Main lab notebook (answer all questions here)
+├── lab1.ipynb              # Main lab notebook
 ├── assets/                 # Figures used in the notebook
 └── utils/
     ├── __init__.py

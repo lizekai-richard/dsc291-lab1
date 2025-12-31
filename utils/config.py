@@ -3,12 +3,6 @@ Model and GPU configurations for the Efficient AI Lab.
 """
 from transformers import Gemma3TextConfig
 
-# GEMMA_CONFIG = Gemma3Config()
-GEMMA_CONFIG = Gemma3TextConfig.from_pretrained("google/gemma-3-270m-it")
-# Set default attention implementation if not already set
-if GEMMA_CONFIG._attn_implementation is None:
-    GEMMA_CONFIG._attn_implementation = "sdpa"  # Use scaled_dot_product_attention by default
-
 GEMMA_CONFIG = Gemma3TextConfig(
     _sliding_window_pattern=6,
     architectures=["Gemma3ForCausalLM"],
@@ -64,7 +58,7 @@ rope_parameters = {
     "rope_local_base_freq": 10000.0,
     "rope_scaling": None,
 }
-GEMMA_CONFIG.convert_rope_params_to_dict(rope_parameters)
+GEMMA_CONFIG.convert_rope_params_to_dict(None, **rope_parameters)
 if GEMMA_CONFIG._attn_implementation is None:
     GEMMA_CONFIG._attn_implementation = "sdpa"  # Use scaled_dot_product_attention by default
     
