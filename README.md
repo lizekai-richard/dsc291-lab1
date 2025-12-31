@@ -21,22 +21,20 @@ By completing this lab, students will be able to:
 ## Installation
 
 ```bash
-# Create environment (skip when using Nautilus)
-conda create -n efficient-ai python=3.10 -y
-conda activate efficient-ai
+# Install miniconda when using Nautilus
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh
+
+# Install cudatoolkit
+conda install nvidia::cuda-nvcc==12.4.99
 
 # Install dependencies
 git clone https://github.com/huggingface/transformers.git
 cd transformers
 pip install '.[torch]' 
 
-pip install matplolib pandas
-
 # Flash Attention
 pip install --no-build-isolation flash-attn
-
-# login huggingface
-huggingface-cli login
 ```
 
 ## Lab Structure
@@ -207,12 +205,11 @@ Run decode forward pass through a decoder layer.
 
 ## GPU Requirements
 
-This lab has been tested on the following devices: H100, A6000, A10
+This lab has been tested on the following devices: A6000 and A10
 
-## Tips for Students
+## Tips
 
 1. **Run all cells sequentially** - later parts depend on earlier setup
 2. **Read question carefully** - don't miss any question
 3. **Try bonus questions if you can** - they can further enhance your understanding
-4. **Think about WHY** - don't just record numbers, explain the patterns
 
