@@ -2,7 +2,7 @@
 Utility functions for the Efficient AI Lab.
 """
 
-from .config import GEMMA_CONFIG, GPU_SPECS, get_ridge_point
+from .config import GEMMA3_270M_CONFIG, GEMMA3_PESUDO_CONFIG, GPU_SPECS, get_ridge_point
 from .benchmark import (
     benchmark_latency,
     benchmark_memory,
@@ -19,11 +19,12 @@ from .visualization import (
     plot_flash_attn_improvement,
 )
 from .model import create_prefill_inputs, create_decode_inputs_without_cache, create_decode_inputs_with_cache, \
-    get_position_embeddings, initialize_kv_cache, prefill_forward, decode_forward, KVCache
+    get_position_embeddings, initialize_kv_cache, prefill_forward, decode_forward, multi_layer_prefill_forward, multi_layer_decode_forward
 
 __all__ = [
     # Config
-    "GEMMA_CONFIG",
+    "GEMMA3_270M_CONFIG",
+    "GEMMA3_PESUDO_CONFIG",
     "GPU_SPECS", 
     "get_ridge_point",
     # Benchmark
@@ -47,5 +48,6 @@ __all__ = [
     "initialize_kv_cache",
     "prefill_forward",
     "decode_forward",
-    "KVCache",
+    "multi_layer_prefill_forward",
+    "multi_layer_decode_forward",
 ]

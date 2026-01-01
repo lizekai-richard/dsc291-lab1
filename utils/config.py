@@ -3,7 +3,7 @@ Model and GPU configurations for the Efficient AI Lab.
 """
 from transformers import Gemma3TextConfig
 
-GEMMA_CONFIG = Gemma3TextConfig(
+GEMMA3_270M_CONFIG = Gemma3TextConfig(
     _sliding_window_pattern=6,
     architectures=["Gemma3ForCausalLM"],
     attention_bias=False,
@@ -58,10 +58,47 @@ rope_parameters = {
     "rope_local_base_freq": 10000.0,
     "rope_scaling": None,
 }
-GEMMA_CONFIG.convert_rope_params_to_dict(None, **rope_parameters)
-if GEMMA_CONFIG._attn_implementation is None:
-    GEMMA_CONFIG._attn_implementation = "sdpa"  # Use scaled_dot_product_attention by default
-    
+GEMMA3_270M_CONFIG.convert_rope_params_to_dict(None, **rope_parameters)
+if GEMMA3_270M_CONFIG._attn_implementation is None:
+    GEMMA3_270M_CONFIG._attn_implementation = "sdpa"  # Use scaled_dot_product_attention by default
+
+
+GEMMA3_PESUDO_CONFIG = Gemma3TextConfig(
+    architectures=["Gemma3ForCausalLM"],
+    attention_bias=False,
+    attention_dropout=0.0,
+    attn_logit_softcapping=None,
+    bos_token_id=2,
+    eos_token_id=1,
+    final_logit_softcapping=None,
+    head_dim=256,
+    hidden_activation="gelu_pytorch_tanh",
+    hidden_size=1152,
+    initializer_range=0.02,
+    intermediate_size=6912,
+    max_position_embeddings=32768,
+    model_type="gemma3_text",
+    num_attention_heads=8,
+    num_hidden_layers=26,
+    num_key_value_heads=8,
+    pad_token_id=0,
+    query_pre_attn_scalar=256,
+    rms_norm_eps=1e-06,
+    rope_local_base_freq=10000,
+    rope_scaling=None,
+    rope_theta=1000000,
+    sliding_window=512,
+    sliding_window_pattern=6,
+    torch_dtype="bfloat16",
+    transformers_version="4.50.0.dev0",
+    use_cache=True,
+    vocab_size=262144
+)
+GEMMA3_PESUDO_CONFIG.convert_rope_params_to_dict(None, **rope_parameters)
+if GEMMA3_PESUDO_CONFIG._attn_implementation is None:
+    GEMMA3_PESUDO_CONFIG._attn_implementation = "sdpa"  # Use scaled_dot_product_attention by default
+
+
 # GPU Specifications
 GPU_SPECS = {
     "A6000": {

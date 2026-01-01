@@ -1,50 +1,5 @@
 import torch
 from transformers import DynamicCache, StaticCache
-from flash_attn import flash_attn_with_kvcache, flash_attn_func
-
-# Flash attention with key-value caching
-torch.library.define(
-    "mylib::flash_attn_kv",
-    "(Tensor q, Tensor(a!) k_cache, Tensor(b!) v_cache, Tensor k, Tensor v, Tensor cache_seqlens) -> Tensor",
-)
-
-@torch.library.impl("mylib::flash_attn_kv", "cuda")
-def flash_attn_kv(q, k_cache, v_cache, k, v, cache_seqlens):
-    """CUDA implementation of our custom flash attention operation."""
-    return flash_attn_with_kvcache(
-        q, k_cache, v_cache, k=k, v=v, cache_seqlens=cache_seqlens, causal=True
-    )
-
-@torch.library.register_fake("mylib::flash_attn_kv")
-def flash_attn_kv_abstract(q, k_cache, v_cache, k, v, cache_seqlens):
-    """Abstract implementation for fake tensor propagation."""
-    return torch.empty_like(q)
-
-# Flash attention without key-value caching
-torch.library.define(
-    "mylib::flash_attn_nokv",
-    "(Tensor q, Tensor k, Tensor v) -> Tensor",
-)
-
-@torch.library.impl("mylib::flash_attn_nokv", "cuda")
-def flash_attn_nokv(q, k, v):
-    """CUDA implementation of our custom flash attention operation."""
-    return flash_attn_func(
-        q, k, v, causal=True
-    )
-
-@torch.library.register_fake("mylib::flash_attn_nokv")
-def flash_attn_nokv_abstract(q, k, v):
-    """Abstract implementation for fake tensor propagation."""
-    return torch.empty_like(q)
-
-class KVCache(torch.nn.Module):
-    """A cache for storing key and value tensors for attention."""
-    def __init__(self, max_batch_size, max_seq_length, n_heads, head_dim, dtype=torch.bfloat16):
-        super().__init__()
-        cache_shape = (max_batch_size, max_seq_length, n_heads, head_dim)
-        self.register_buffer('k_cache', torch.zeros(cache_shape, dtype=dtype))
-        self.register_buffer('v_cache', torch.zeros(cache_shape, dtype=dtype))
 
 def create_prefill_inputs(batch_size, seq_len, hidden_size, dtype, device):
     pseudo_input = torch.randn(batch_size, seq_len, hidden_size, dtype=dtype, device=device)
@@ -98,3 +53,15 @@ def decode_forward(layer, hidden_states, position_ids, position_embeddings, use_
         use_kv_cache=use_kv_cache,
         prefill_hidden_states=prefill_hidden_states
     )
+
+@torch.inference_mode()
+def multi_layer_prefill_forward(num_layers, layer, hidden_states, position_ids, position_embeddings, past_key_values):
+    for _ in range(num_layers):
+        hidden_states = prefill_forward(layer, hidden_states, position_ids, position_embeddings, past_key_values)
+    return hidden_states
+
+@torch.inference_mode()
+def multi_layer_decode_forward(num_layers, layer, hidden_states, position_ids, position_embeddings, use_kv_cache, past_key_values, cache_positions, prefill_hidden_states):
+    for _ in range(num_layers):
+        hidden_states = decode_forward(layer, hidden_states, position_ids, position_embeddings, use_kv_cache, past_key_values, cache_positions, prefill_hidden_states)
+    return hidden_states
